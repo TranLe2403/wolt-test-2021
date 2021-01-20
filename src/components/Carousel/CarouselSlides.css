@@ -1,0 +1,28 @@
+.single-restaurant-container {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+
+.online {
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  border: thin solid 1px;
+  background: green;
+}
+
+.offline {
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  border: thin solid 1px;
+  background: red;
+}
+
+.restaurant-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 70%;
+  white-space: nowrap;
+}

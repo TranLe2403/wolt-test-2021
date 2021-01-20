@@ -1,0 +1,16 @@
+.arrow-button-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.arrow-button{
+    width: 30px;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.restaurants-container{
+    display: flex;
+}
