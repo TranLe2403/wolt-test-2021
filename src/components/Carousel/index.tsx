@@ -43,12 +43,14 @@ const Carousel = (props: Props): JSX.Element => {
   const handleInfiniteCarousel = (
     restaurantArray: Restaurant[]
   ): JSX.Element[] => {
-
     const slicedArray = restaurantArray.slice(activeIndex, activeIndex + 5);
 
     if (slicedArray.length < 5) {
       const itemsLeft = restaurantArray.length - activeIndex;
-      const restaurantsRemainingArray = restaurantArray.slice(activeIndex, restaurantArray.length);
+      const restaurantsRemainingArray = restaurantArray.slice(
+        activeIndex,
+        restaurantArray.length
+      );
       const addedMoreRestaurantArray = restaurantArray.slice(0, 5 - itemsLeft);
 
       let newArray = restaurantsRemainingArray.concat(addedMoreRestaurantArray);
@@ -70,8 +72,8 @@ const Carousel = (props: Props): JSX.Element => {
 
   if (props.restaurantArray.length < 5) {
     return (
-      <div>
-        <div style={{ display: "flex" }}>
+      <div className="grid-container">
+        <div className="restaurant-grids">
           {props.restaurantArray.map((restaurant) => (
             <CarouselSlides
               restaurantSlide={restaurant}
@@ -84,26 +86,35 @@ const Carousel = (props: Props): JSX.Element => {
   }
 
   return (
-    <div>
-      <div className="arrow-button-container">
-        <button
-          onClick={goToPrevSlide}
-          className="arrow-button"
-          data-testid="back-arrow"
-        >
-          <img src={Left} alt="Prev" style={{ width: 20 }} />
-        </button>
-        <button onClick={goToNextSlide} className="arrow-button">
-          <img
-            src={Right}
-            alt="Next"
-            style={{ width: 20 }}
-            data-testid="next-arrow"
-          />
-        </button>
-      </div>
-      <div className="restaurants-container" data-testid="test-restaurants-container">
-        {handleInfiniteCarousel(props.restaurantArray)}
+    <div className="grid-container">
+      <div className="fields-cover">
+        <div className="buttons-cover">
+          <div className="arrow-button-container">
+            <button
+              onClick={goToPrevSlide}
+              className="arrow-button"
+              data-testid="back-arrow"
+            >
+              <img src={Left} alt="Prev" style={{ width: 20 }} />
+            </button>
+            <button onClick={goToNextSlide} className="arrow-button">
+              <img
+                src={Right}
+                alt="Next"
+                style={{ width: 20 }}
+                data-testid="next-arrow"
+              />
+            </button>
+          </div>
+        </div>
+        <div className="grid-container">
+          <div
+            className="restaurant-grids"
+            data-testid="test-restaurants-container"
+          >
+            {handleInfiniteCarousel(props.restaurantArray)}
+          </div>
+        </div>
       </div>
     </div>
   );

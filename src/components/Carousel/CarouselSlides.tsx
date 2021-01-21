@@ -10,7 +10,7 @@ type Props = {
 const CarouselSlides = (props: Props): JSX.Element => {
   const { blurhash, online, name } = props.restaurantSlide;
   return (
-    <div style={{ margin: 20 }}>
+    <div className="restaurant-item">
       <Blurhash
         hash={blurhash}
         width={200}
@@ -22,12 +22,12 @@ const CarouselSlides = (props: Props): JSX.Element => {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
+          alignItems: "center",
           marginLeft: 10,
         }}
       >
-        <p className="restaurant-name">{name}</p>
+        <div className="restaurant-name">{name}</div>
         <div className={online ? "online" : "offline"} />
       </div>
     </div>
