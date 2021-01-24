@@ -10,25 +10,34 @@
   align-items: center;
 }
 
-.restaurant-grids {
-  display: grid;
-  grid-template-columns: 200px 200px 200px 200px 200px;
+.all-restaurants {
+  display: flex;
   column-gap: 40px;
 }
 
-.grid-container {
+.container {
+  display: flex;
+  justify-content: center;
+  border: thin solid black;
+  padding-bottom: 20px;
+  margin: 15px;
+  border-radius: 20px;
+}
+
+.all-restaurants-container {
   display: flex;
   justify-content: center;
 }
 
-.buttons-cover {
+.title-buttons-cover {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
 }
 
-.fields-cover {
+.section-container {
   display: grid;
   grid-template-columns: 1200px;
   column-gap: 40px;
-  row-gap: 20px;
 }

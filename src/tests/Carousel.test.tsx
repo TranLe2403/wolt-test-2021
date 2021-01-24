@@ -2,105 +2,94 @@ import React from "react";
 import { fireEvent, render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
-import Carousel from "../components/Carousel/index";
-import { lessThanThreeItems, restaurants } from "./dummyRestaurants";
+import Carousel, { limitLength } from "../components/Carousel/index";
+import { smallListOfRestaurants, restaurants } from "./dummyRestaurants";
 
-describe("<Carousel />", () => {
-  test("No arrow buttons displayed if there are less than 5 items in the list of restaurant", () => {
-    const component = render(<Carousel restaurantArray={lessThanThreeItems} />);
-
-    const getQuery = component.container.querySelector("button");
-
-    expect(getQuery).toBe(null);
-  });
-
-  // The following tests are using restaurants array (6 items) from dummyRestaurant file
-  test("5 items are displayed at the same time", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
-    const allItems = component.getByTestId("test-restaurants-container");
-
-    expect(allItems.childElementCount).toBe(5);
-  });
-
-  test("Initially, the list of restaurants which are displayed in the set of 6 items", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
-
-    expect(component.container).toHaveTextContent(
-      "restaurant founded by TranLe"
+describe("Carousel", () => {
+  it("has no arrow buttons displayed if the number of items is less than or equal limitNumber", () => {
+    const component = render(
+      <Carousel sectionContent={smallListOfRestaurants} />
     );
-    expect(component.container).toHaveTextContent("Sea Chain");
-    expect(component.container).toHaveTextContent("Fake Tomato Mafia");
-    expect(component.container).toHaveTextContent("Chili powder");
-    expect(component.container).toHaveTextContent("Black Pepper Grill");
-    expect(component.container).not.toHaveTextContent("Rosemary");
+    const anyButton = component.container.querySelector("button");
+
+    expect(anyButton).toBe(null);
   });
 
-  test("when clicking on Next button, the first item will disappear and the 6th one is added to the fifth position", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
+  it("renders exactly maximum number of allowed items displayed at the same time", () => {
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
+
+    expect(allItems.childElementCount).toBe(limitLength);
+  });
+
+  test("when clicking on Next button, the first item will disappear and the second item will be shown as the first position", () => {
+    const component = render(<Carousel sectionContent={restaurants} />);
     const nextButton = component.getByTestId("next-arrow");
-    const allItems = component.getByTestId("test-restaurants-container");
+    const allItems = component.getByTestId("test-all-restaurants");
 
-    expect(component.container).not.toHaveTextContent("Rosemary");
+    const firstShownRestaurant = allItems.children.item(0)
+      ?.textContent as string;
+
+    const secondShownRestaurant = allItems.children.item(1)
+      ?.textContent as string;
 
     fireEvent.click(nextButton);
 
-    const firstPositionItem = allItems.children.item(4);
-
-    expect(firstPositionItem).toHaveTextContent("Rosemary");
-    expect(component.container).not.toHaveTextContent(
-      "restaurant founded by TranLe"
+    expect(secondShownRestaurant).toEqual(
+      allItems.children.item(0)?.textContent as string
     );
+    expect(component.container).not.toHaveTextContent(firstShownRestaurant);
   });
 
-  test("when clicking on Back button, sixth item is added to the first position and fifth one will disappear", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
-    const nextButton = component.getByTestId("back-arrow");
-    const allItems = component.getByTestId("test-restaurants-container");
+  test("when clicking on Back button, the first item is moved to the second position and the last one will disappear", () => {
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const backButton = component.getByTestId("back-arrow");
+    const allItems = component.getByTestId("test-all-restaurants");
 
-    expect(component.container).not.toHaveTextContent("Rosemary");
+    const firstShownRestaurant = allItems.children.item(0)
+      ?.textContent as string;
+    const lastShownRestaurant = allItems.children.item(limitLength - 1)
+      ?.textContent as string;
 
-    fireEvent.click(nextButton);
+    fireEvent.click(backButton);
 
-    const firstPositionItem = allItems.children.item(0);
-
-    expect(firstPositionItem).toHaveTextContent("Rosemary");
-    expect(component.container).not.toHaveTextContent("Black Pepper Grill");
+    expect(firstShownRestaurant).toEqual(
+      allItems.children.item(1)?.textContent as string
+    );
+    expect(component.container).not.toHaveTextContent(lastShownRestaurant);
   });
 
-  test("when double clicking on Next button, the first restaurant will be at fifth position - to the right of sixth one", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
-    const allItems = component.getByTestId("test-restaurants-container");
-    const getTestRestaurant = allItems.children.item(3);
-
-    expect(getTestRestaurant).toHaveTextContent("Chili powder");
-
+  test("For infinite carousel, the first restaurant will be shown again after passing all items of set by continuously clicking on Next button", () => {
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
     const nextButton = component.getByTestId("next-arrow");
 
-    fireEvent.click(nextButton);
-    fireEvent.click(nextButton);
+    const firstShownRestaurant = allItems.children.item(0)
+      ?.textContent as string;
 
-    expect(getTestRestaurant).toEqual(allItems.children.item(1));
-    expect(allItems.children.item(1)).toHaveTextContent("Chili powder");
+    for (let i = 0; i < restaurants.restaurants.length - limitLength + 1; i++) {
+      fireEvent.click(nextButton);
+    }
+
+    expect(firstShownRestaurant).toEqual(
+      allItems.children.item(limitLength - 1)?.textContent as string
+    );
   });
 
-  test("when double clicking on back button, the first restaurant will be at fifth position - to the right of sixth one", () => {
-    const component = render(<Carousel restaurantArray={restaurants} />);
-    const allItems = component.getByTestId("test-restaurants-container");
-    const getFirstRestaurant = allItems.children.item(0);
-
-    expect(getFirstRestaurant).toHaveTextContent(
-      "restaurant founded by TranLe"
-    );
-
+  test("For infinite carousel, the first restaurant will be shown at initial its position after passing all items of set by continuously clicking on Back button", () => {
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
     const backButton = component.getByTestId("back-arrow");
 
-    fireEvent.click(backButton);
-    fireEvent.click(backButton);
+    const firstShownRestaurant = allItems.children.item(0)
+      ?.textContent as string;
 
-    expect(getFirstRestaurant).toEqual(allItems.children.item(2));
-    expect(allItems.children.item(2)).toHaveTextContent(
-      "restaurant founded by TranLe"
+    for (let i = 0; i < restaurants.restaurants.length; i++) {
+      fireEvent.click(backButton);
+    }
+
+    expect(firstShownRestaurant).toEqual(
+      allItems.children.item(0)?.textContent as string
     );
-    expect(allItems.children.item(1)).toHaveTextContent("Rosemary"); //This is sixth restaurant in array
   });
 });

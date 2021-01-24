@@ -2,117 +2,128 @@ import React, { useState } from "react";
 
 import Right from "../../images/next.svg";
 import Left from "../../images/back.svg";
-import { Restaurant } from "../../entities/sections";
-import CarouselSlides from "./CarouselSlides";
+import Section, { Restaurant } from "../../entities/sections";
+import CarouselSlides from "../CarouselSlide";
 import "./index.css";
 
 type Props = {
-  restaurantArray: Restaurant[];
+  sectionContent: Section;
 };
 
-const Carousel = (props: Props): JSX.Element => {
+type Limit = 2 | 3 | 4 | 5;
+
+export const limitLength: Limit = 5;
+
+const Carousel = ({ sectionContent }: Props): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const goToPrevSlide = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
     e.preventDefault();
-    let index = activeIndex;
-    let slidesLength = props.restaurantArray.length;
 
-    if (index < 1) {
-      index = slidesLength;
+    let indexArray = activeIndex;
+    let slidesLength = sectionContent.restaurants.length;
+
+    if (indexArray < 1) {
+      indexArray = slidesLength;
     }
-    --index;
-    setActiveIndex(index);
+    --indexArray;
+
+    setActiveIndex(indexArray);
   };
 
   const goToNextSlide = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    let index = activeIndex;
-    let slidesLength = props.restaurantArray.length - 1;
-    if (index === slidesLength) {
-      index = -1;
+
+    let indexArray = activeIndex;
+    let slidesLength = sectionContent.restaurants.length - 1;
+
+    if (indexArray === slidesLength) {
+      indexArray = -1;
     }
-    ++index;
-    setActiveIndex(index);
+    ++indexArray;
+
+    setActiveIndex(indexArray);
   };
 
   const handleInfiniteCarousel = (
     restaurantArray: Restaurant[]
   ): JSX.Element[] => {
-    const slicedArray = restaurantArray.slice(activeIndex, activeIndex + 5);
+    if (restaurantArray.length < limitLength) {
+      return restaurantArray.map((restaurant) => (
+        <CarouselSlides restaurantItem={restaurant} key={restaurant.blurhash} />
+      ));
+    }
 
-    if (slicedArray.length < 5) {
+    const slicedArray = restaurantArray.slice(
+      activeIndex,
+      activeIndex + limitLength
+    );
+
+    if (slicedArray.length < limitLength) {
       const itemsLeft = restaurantArray.length - activeIndex;
+      // get the array of items remaining which has its length less than limitLength
       const restaurantsRemainingArray = restaurantArray.slice(
         activeIndex,
         restaurantArray.length
       );
-      const addedMoreRestaurantArray = restaurantArray.slice(0, 5 - itemsLeft);
+      // take exact number of items needed to fill in the set in order to have its length equal to limitLength
+      const addedMoreRestaurantArray = restaurantArray.slice(
+        0,
+        limitLength - itemsLeft
+      );
 
-      let newArray = restaurantsRemainingArray.concat(addedMoreRestaurantArray);
+      const finalRestaurants = restaurantsRemainingArray.concat(
+        addedMoreRestaurantArray
+      );
 
-      return newArray.map((restaurant) => (
+      return finalRestaurants.map((restaurant) => (
         <div key={restaurant.blurhash}>
-          <CarouselSlides restaurantSlide={restaurant} />
+          <CarouselSlides restaurantItem={restaurant} />
         </div>
       ));
     }
-    const showData = slicedArray.map((restaurant) => (
+    const finalRestaurants = slicedArray.map((restaurant) => (
       <div key={restaurant.blurhash}>
-        <CarouselSlides restaurantSlide={restaurant} />
+        <CarouselSlides restaurantItem={restaurant} />
       </div>
     ));
 
-    return showData;
+    return finalRestaurants;
   };
 
-  if (props.restaurantArray.length < 5) {
-    return (
-      <div className="grid-container">
-        <div className="restaurant-grids">
-          {props.restaurantArray.map((restaurant) => (
-            <CarouselSlides
-              restaurantSlide={restaurant}
-              key={restaurant.blurhash}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="grid-container">
-      <div className="fields-cover">
-        <div className="buttons-cover">
-          <div className="arrow-button-container">
-            <button
-              onClick={goToPrevSlide}
-              className="arrow-button"
-              data-testid="back-arrow"
-            >
-              <img src={Left} alt="Prev" style={{ width: 20 }} />
-            </button>
-            <button onClick={goToNextSlide} className="arrow-button">
-              <img
-                src={Right}
-                alt="Next"
-                style={{ width: 20 }}
+    <div className="container">
+      <div className="section-container">
+        <div className="title-buttons-cover">
+          <h2>
+            {sectionContent.title} ({sectionContent.restaurants.length})
+          </h2>
+          {sectionContent.restaurants.length > limitLength && (
+            <div className="arrow-button-container">
+              <button
+                onClick={goToPrevSlide}
+                className="arrow-button"
+                data-testid="back-arrow"
+              >
+                <img src={Left} alt="Prev" style={{ width: 20 }} />
+              </button>
+              <button
+                onClick={goToNextSlide}
+                className="arrow-button"
                 data-testid="next-arrow"
-              />
-            </button>
-          </div>
+              >
+                <img src={Right} alt="Next" style={{ width: 20 }} />
+              </button>
+            </div>
+          )}
         </div>
-        <div className="grid-container">
-          <div
-            className="restaurant-grids"
-            data-testid="test-restaurants-container"
-          >
-            {handleInfiniteCarousel(props.restaurantArray)}
+        <div className="all-restaurants-container">
+          <div className="all-restaurants" data-testid="test-all-restaurants">
+            {handleInfiniteCarousel(sectionContent.restaurants)}
           </div>
         </div>
       </div>
