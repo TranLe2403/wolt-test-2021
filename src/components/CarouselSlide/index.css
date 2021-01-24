@@ -38,7 +38,6 @@
 
 .offline-restaurant {
   opacity: 0.4;
-  z-index: 0;
 }
 
 .closed {
@@ -48,5 +47,4 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  z-index: 1;
 }
