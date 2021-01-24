@@ -10,7 +10,7 @@ function App() {
 
   return (
     <>
-      <h1 className="title">Discovery App</h1>
+      <h1 className="title">DISCOVERY APP</h1>
       <div data-testid="restaurant-fields">
         {allRestaurants.map((section) => (
           <div key={section.title}>

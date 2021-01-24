@@ -3,11 +3,18 @@
 }
 
 .arrow-button {
+  height: 30px;
   width: 30px;
   outline: none;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: thin solid #cecece;
+  background: white;
+}
+
+.arrow-button:hover {
+  background-color: #009de0;
 }
 
 .all-restaurants {
