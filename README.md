@@ -16,7 +16,8 @@ This is an assignment from Wolt to apply for Frontend Internship - Summer 2021.
 
 ## Main features in the application
 
+- Infinite carousel is also applied in the application
 - Display restaurants in different Sections
 - Arrow buttons are shown if the number of restaurants in a Section is greater than the maximum amount of shown restaurants at a time
 - Arrow buttons are used to show the next or previous restaurant, one at a time
-- Infinite carousel is also applied in the application
+- Responsive carousel which will display set of restaurants properly based on screen size

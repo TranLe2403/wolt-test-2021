@@ -2,10 +2,40 @@ import React from "react";
 import { fireEvent, render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
-import Carousel, { limitLength } from "../components/Carousel/index";
+import Carousel from "../components/Carousel/index";
 import { smallListOfRestaurants, restaurants } from "./dummyRestaurants";
 
+describe("Responsive carousel", () => {
+  it("should display 1 item if screen size is less than 768px", () => {
+    window = Object.assign(window, { innerWidth: 600 });
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
+
+    expect(allItems.childElementCount).toEqual(1);
+  });
+
+  it("should display 3 items if screen size is less than 1280px and more than 768px", () => {
+    window = Object.assign(window, { innerWidth: 1000 });
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
+
+    expect(allItems.childElementCount).toEqual(3);
+  });
+
+  it("should display 5 items if screen size is more than 1280px", () => {
+    window = Object.assign(window, { innerWidth: 1300 });
+    const component = render(<Carousel sectionContent={restaurants} />);
+    const allItems = component.getByTestId("test-all-restaurants");
+
+    expect(allItems.childElementCount).toEqual(5);
+  });
+});
+
 describe("Carousel", () => {
+  beforeEach(() => {
+    window = Object.assign(window, { innerWidth: 1290 });
+  });
+
   it("has no arrow buttons displayed if the number of items is less than or equal limitNumber", () => {
     const component = render(
       <Carousel sectionContent={smallListOfRestaurants} />
@@ -13,13 +43,6 @@ describe("Carousel", () => {
     const anyButton = component.container.querySelector("button");
 
     expect(anyButton).toBe(null);
-  });
-
-  it("renders exactly maximum number of allowed items displayed at the same time", () => {
-    const component = render(<Carousel sectionContent={restaurants} />);
-    const allItems = component.getByTestId("test-all-restaurants");
-
-    expect(allItems.childElementCount).toBe(limitLength);
   });
 
   test("when clicking on Next button, the first item will disappear and the second item will be shown as the first position", () => {
@@ -48,7 +71,7 @@ describe("Carousel", () => {
 
     const firstShownRestaurant = allItems.children.item(0)
       ?.textContent as string;
-    const lastShownRestaurant = allItems.children.item(limitLength - 1)
+    const lastShownRestaurant = allItems.children.item(4)
       ?.textContent as string;
 
     fireEvent.click(backButton);
@@ -67,12 +90,12 @@ describe("Carousel", () => {
     const firstShownRestaurant = allItems.children.item(0)
       ?.textContent as string;
 
-    for (let i = 0; i < restaurants.restaurants.length - limitLength + 1; i++) {
+    for (let i = 0; i < restaurants.restaurants.length - 4; i++) {
       fireEvent.click(nextButton);
     }
 
     expect(firstShownRestaurant).toEqual(
-      allItems.children.item(limitLength - 1)?.textContent as string
+      allItems.children.item(4)?.textContent as string
     );
   });
 

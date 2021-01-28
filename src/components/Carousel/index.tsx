@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Right from "../../images/next.svg";
 import Left from "../../images/back.svg";
@@ -10,12 +10,34 @@ type Props = {
   sectionContent: Section;
 };
 
-type Limit = 2 | 3 | 4 | 5;
-
-export const limitLength: Limit = 5;
+export type Limit = 1 | 3 | 5;
 
 const Carousel = ({ sectionContent }: Props): JSX.Element => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  const getNumberOfItems = (): Limit => {
+    const screenSize: number = window.innerWidth;
+
+    if (screenSize > 1280) {
+      return 5;
+    } else if (screenSize < 1280 && screenSize >= 768) {
+      return 3;
+    }
+    return 1;
+  };
+
+  const [limitLength, setLimitLength] = useState<Limit>(getNumberOfItems());
+
+  useEffect(() => {
+    window.addEventListener("resize", reportWindowSize);
+    return () => {
+      window.removeEventListener("resize", reportWindowSize);
+    };
+  });
+
+  function reportWindowSize() {
+    setLimitLength(getNumberOfItems());
+  }
 
   const goToPrevSlide = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -23,10 +45,11 @@ const Carousel = ({ sectionContent }: Props): JSX.Element => {
     e.preventDefault();
 
     let indexArray = activeIndex;
-    let slidesLength = sectionContent.restaurants.length;
+    let lastIndex = sectionContent.restaurants.length - 1;
 
     if (indexArray < 1) {
-      indexArray = slidesLength;
+      setActiveIndex(lastIndex);
+      return;
     }
     --indexArray;
 
@@ -35,14 +58,15 @@ const Carousel = ({ sectionContent }: Props): JSX.Element => {
 
   const goToNextSlide = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  ): void => {
     e.preventDefault();
 
     let indexArray = activeIndex;
-    let slidesLength = sectionContent.restaurants.length - 1;
+    let lastIndex = sectionContent.restaurants.length - 1;
 
-    if (indexArray === slidesLength) {
-      indexArray = -1;
+    if (indexArray === lastIndex) {
+      setActiveIndex(0);
+      return;
     }
     ++indexArray;
 
